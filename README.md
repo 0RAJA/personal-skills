@@ -16,6 +16,15 @@
     │   ├── README.md
     │   └── references/
     │       └── artifact-templates.md
+    ├── local-context-maintenance/         # 本地上下文维护
+    │   ├── SKILL.md
+    │   ├── README.md
+    │   ├── references/
+    │   │   └── project-examples.md
+    │   ├── assets/
+    │   │   └── maintenance-record.md
+    │   └── agents/
+    │       └── openai.yaml
     └── siyuan-openclaw-kb-maintenance/    # 思源笔记知识库维护
         ├── SKILL.md
         ├── README.md
@@ -41,6 +50,13 @@
 
 - **核心能力**：建地图 → 拆模块跑通 → 源码对齐 → 主动总结纠错 → 疑惑档案
 - **适用场景**：系统性学习大型代码库、新框架、多层架构，沉淀学习笔记与教程
+
+### [本地上下文维护](./skills/local-context-maintenance/README.md)
+
+根据当前项目背景与既有目录、命名和文档风格整理本地材料，便于查找、理解与后续接续。
+
+- **核心能力**：材料归属与入口梳理、目录层级调整、引用修补、原件和已有工作保全
+- **适用场景**：材料归类、目录重构、历史整理续接、旧结论及冲突材料复核
 
 ### [思源笔记知识库维护](./skills/siyuan-openclaw-kb-maintenance/README.md)
 

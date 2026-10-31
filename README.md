@@ -20,7 +20,14 @@
     │   ├── SKILL.md
     │   ├── README.md
     │   ├── references/
+    │   │   ├── lifecycle.md
+    │   │   ├── artifact-versions.md
     │   │   └── project-examples.md
+    │   ├── evals/
+    │   │   ├── evals.json
+    │   │   ├── multi-turn.md
+    │   │   ├── prepare.py
+    │   │   └── files/
     │   ├── assets/
     │   │   └── maintenance-record.md
     │   └── agents/
@@ -53,10 +60,10 @@
 
 ### [本地上下文维护](./skills/local-context-maintenance/README.md)
 
-根据当前项目背景与既有目录、命名和文档风格整理本地材料，便于查找、理解与后续接续。
+沿用已有目录与记录，随任务增量维护资料入口、当前进展和重要版本，支持跨会话与跨 Agent 接续。
 
-- **核心能力**：材料归属与入口梳理、目录层级调整、引用修补、原件和已有工作保全
-- **适用场景**：材料归类、目录重构、历史整理续接、旧结论及冲突材料复核
+- **核心能力**：轻量阶段约束、入口可达的单一维护源、版本保全与安全恢复，以及贯通三者的完整案例与脱敏回归用例
+- **适用场景**：持续事项跟进、讨论与证据沉淀、阶段产物保全、跨会话接续及既有材料整理
 
 ### [思源笔记知识库维护](./skills/siyuan-openclaw-kb-maintenance/README.md)
 

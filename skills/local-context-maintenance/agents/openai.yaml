@@ -1,4 +1,4 @@
 interface:
   display_name: "本地上下文维护"
-  short_description: "根据项目背景与既有风格整理目录上下文，便于查找、理解与接续"
-  default_prompt: "使用 $local-context-maintenance 理解当前项目背景、材料用途和已有风格，提出必要的目录上下文整理与重构建议；重要取舍与我讨论，在授权范围内执行并验证。"
+  short_description: "持续维护材料分层、接续入口、当前结论与产物版本，兼顾历史整理和原件保全"
+  default_prompt: "使用 $local-context-maintenance 按当前任务阶段持续维护本地上下文，沿用已有分类、专题和进展，明确阅读入口及有效资料，并保全重要产物版本与恢复依据。"

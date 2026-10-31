@@ -1,0 +1,5 @@
+{
+  "environment": "sandbox-example",
+  "rollback_enabled": true,
+  "max_retries": 3
+}

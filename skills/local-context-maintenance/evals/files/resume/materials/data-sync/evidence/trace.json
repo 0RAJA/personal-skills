@@ -1,0 +1,8 @@
+{
+  "kind": "fictional-local-simulation",
+  "batch": "batch-example",
+  "same_seen_instance": true,
+  "calls": 2,
+  "accepted": 1,
+  "sandbox_validation": "NOT_RUN"
+}

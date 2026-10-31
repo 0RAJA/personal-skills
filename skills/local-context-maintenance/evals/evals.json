@@ -1,0 +1,102 @@
+{
+  "skill_name": "local-context-maintenance",
+  "format_version": 1,
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-progress",
+      "fixture_root": "evals/files/new-progress",
+      "prompt": "从 materials/README.md 了解运维演练专题。补一份上线前检查清单草稿，覆盖配置核对、回滚验证和人工确认；结合现有指南与配置，不执行命令。原指南和配置不改，可以同步相关说明。",
+      "followups": [
+        {
+          "prompt": "今天先停，清单尚未实际演练，等测试环境审批后再推进。可以更新相关说明，给两条简短交接。"
+        }
+      ],
+      "cold_prompt": "从 materials/README.md 接续这个专题。新清单在哪，上次停在哪里，实际做过哪些验证，还在等什么，下一步是什么？只依据文件回答，不修改。",
+      "expected_output": "新增可用清单，现有入口能找到它及暂停条件；真实执行未被冒充为通过，原指南/配置保持。",
+      "expectations": [
+        "主任务：新清单覆盖用户要求并使用提供的配置，未运行实际命令，原指南与配置字节不变。",
+        "上下文：从原材料入口沿有效链接找到新清单与最新跟进；允许清单或已有README兼任维护源，不要求另建progress。",
+        "上下文：停止点保留未演练、等待测试环境审批与下一步；冷接续只凭文件可恢复，不只留在聊天。",
+        "负担：不强迫额外审批或固定模板，不将评测日志写进工作材料。"
+      ],
+      "files": [
+        "evals/files/new-progress/materials/README.md",
+        "evals/files/new-progress/materials/operations/README.md",
+        "evals/files/new-progress/materials/operations/config.json",
+        "evals/files/new-progress/materials/operations/guide.md"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "resume",
+      "fixture_root": "evals/files/resume",
+      "prompt": "从 materials/README.md 接着同步排查专题和已有跟进记录做核对：排查计划中“没有去重、重试再次提交”的当前结论与程序、既有记录是否一致？核对后更新本专题文档，说明生效条件与未验证范围。本轮不要改示例程序或原始证据，也不要执行程序。",
+      "followups": [
+        {
+          "prompt": "今天停在这里，等沙箱可用后再跑重试验证；代码与证据继续不动，可以更新说明，简短交接。"
+        }
+      ],
+      "cold_prompt": "从 materials/README.md 接续：当前结论、适用条件、已有验证、等待条件及下一步是什么？当前轮次有无改程序，上一轮改动与本轮只读约束是否矛盾？只读回答，引用依据。",
+      "expected_output": "复用或明确承接既有跟进，修正活动文档中的旧当前判断；区分本轮禁止改代码与历史已经改过，保留进程内状态条件及沙箱NOT_RUN。",
+      "expectations": [
+        "主任务：正确辨别复用同一seen集合时的进程内去重；不声称跨进程或状态重建后保证去重。程序与evidence下所有文件字节不变，未执行程序。",
+        "上下文：从原入口能到当前维护源；优先续用已有跟进，若更换明确承接，不留并列活跃状态或只搜索可见的孤立进展。",
+        "上下文：计划旧当前结论在原处注明历史或修正，与新进展一致；历史回执不被改写，本轮只读不被错误用来否认上一轮真实改动。",
+        "上下文：沙箱联调NOT_RUN、等待沙箱与下一动作持久化，冷接续不把旧模拟PASS说成本轮/真实环境PASS。",
+        "负担：沿用既有记录，未无差别迁移目录、复制状态或生成无关台账。"
+      ],
+      "files": [
+        "evals/files/resume/materials/README.md",
+        "evals/files/resume/materials/data-sync/README.md",
+        "evals/files/resume/materials/data-sync/code/sync_example.py",
+        "evals/files/resume/materials/data-sync/evidence/change-note.md",
+        "evals/files/resume/materials/data-sync/evidence/trace.json",
+        "evals/files/resume/materials/data-sync/notes/progress.md",
+        "evals/files/resume/materials/data-sync/plan.md"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "shared-version",
+      "fixture_root": "evals/files/shared-version",
+      "prompt": "从 materials/README.md 找到展示专题。把维护入口 index.html 页签“系统概况”改为“入门导览”，简介改为“先看接入流程，再看验证边界。”其他演示页面、样式和图不动，可以同步相关说明；做可做的静态检查。",
+      "followups": [
+        {
+          "prompt": "这版已经给同事试读了，保留它。现在把工作入口的页签改为“阅读路线”，简介不变；相关说明可以同步。"
+        },
+        {
+          "prompt": "本轮只允许修改 materials/demo/index.html，其余文件只读。当前工作稿简介改为“先看接入流程，再确认适用条件。”页签保持不变，试读版保留。",
+          "writable_paths": [
+            "materials/demo/index.html"
+          ]
+        },
+        {
+          "prompt": "只确认一下，样式和图都没改对吧？一句话回答，不改任何文件。",
+          "writable_paths": []
+        },
+        {
+          "prompt": "今天先到这里，等同事试读反馈后再决定是否改图。可以更新相关说明，所有页面、样式和图不再改。给三条简短交接。"
+        }
+      ],
+      "cold_prompt": "从 materials/README.md 接续。当前工作稿与同事试读版各自的页签、简介、位置是什么，共享页是否同步？上次停在哪里，在等谁对哪个版本的反馈，下一步是什么？按需核对实际文件，只读回答并给读取路径，区分本轮与历史验证。",
+      "expected_output": "工作稿按轮次变化，已分享的旧字节不被覆盖；限写与确认轮不写其他材料，恢复说明权限后澄清现行状态和反馈对象，全新Agent能沿入口接续。",
+      "expectations": [
+        "主任务：前三轮分别只有指定文案、页签、简介变化；published.html、样式和图的字节始终不变。",
+        "上下文：分享时保全首轮字节，后续工作稿变化不污染试读快照；明确必要相对资源和恢复位置，未验证独立打开不冒称自包含。",
+        "主任务/负担：限写轮仅index.html可变，确认轮完整工作区无变化且答复一句话；范围限制优先于维护，不擅自补记录。",
+        "上下文：开放说明权限后当前维护源与入口一致，旧当前结论澄清；等待已分享试读版的反馈，不杜撰新工作稿也已分享或已接受。",
+        "上下文：全新Agent从已有入口找到停止点，正确区分工作稿、试读快照和未同步的旧共享页；不以文件名/日期/最大编号推断采用关系。",
+        "负担：不要求固定四行、指定目录或特定快照命名；只在需要保全时保留版本，不把评测产物当日常任务要求。"
+      ],
+      "files": [
+        "evals/files/shared-version/materials/README.md",
+        "evals/files/shared-version/materials/demo/README.md",
+        "evals/files/shared-version/materials/demo/assets/diagram.svg",
+        "evals/files/shared-version/materials/demo/assets/theme.css",
+        "evals/files/shared-version/materials/demo/index.html",
+        "evals/files/shared-version/materials/demo/published.html"
+      ]
+    }
+  ]
+}

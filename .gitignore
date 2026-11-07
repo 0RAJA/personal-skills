@@ -1,3 +1,6 @@
 AGENTS.md
 .agent/
 .DS_Store
+
+# 本地方案、上下文与验证材料
+/debug/

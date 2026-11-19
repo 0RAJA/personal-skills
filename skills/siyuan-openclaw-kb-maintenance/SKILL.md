@@ -1,162 +1,78 @@
 ---
 name: siyuan-openclaw-kb-maintenance
-description: Use when OpenClaw needs to manage a SiYuan knowledge base through API calls (create/read/update/delete notebooks or docs), especially when validating maintenance workflows, handling auth, and preventing false-success API responses.
+description: Use when OpenClaw needs to maintain a SiYuan knowledge base with the official CLI, MCP, or documented API, especially for read-after-write verification and safe recovery from partial or uncertain results.
 ---
 
 # SiYuan OpenClaw KB Maintenance
 
-## Overview
+## Purpose
 
-Use this skill to run safe, verifiable SiYuan CRUD operations for notebook maintenance via API.  
-Core rule: treat API `code=0` as "request accepted", not "state changed".
+Use official SiYuan interfaces rather than maintaining a separate CLI implementation in this repository. This skill supplies the workflow and verification rules, not another transport or command layer.
 
-When available, prefer calling local CLI/script wrappers over ad-hoc raw API composition in the model context.
+A successful exit status or API `code=0` is not sufficient evidence that the intended state changed. Read back and compare the actual state.
 
-## When to Use
+## Official Entry Points
 
-- User wants OpenClaw to maintain SiYuan notes on server/local.
-- Need to run end-to-end CRUD verification.
-- Need reliable scripts for notebook/doc automation.
-- Need to diagnose "API success but no visible change".
+- [Download SiYuan](https://b3log.org/siyuan/download.html)
+- [Official CLI guide, v3.8.10](https://github.com/siyuan-note/siyuan/blob/v3.8.10/README.zh-CN.md#-命令行接口)
+- [Current CLI guide](https://github.com/siyuan-note/siyuan/blob/master/README.zh-CN.md#-命令行接口)
+- [Documented HTTP API, v3.8.10](https://github.com/siyuan-note/siyuan/blob/v3.8.10/docs/API.zh-CN.md)
+- [Official MCP server implementation, v3.8.10](https://github.com/siyuan-note/siyuan/blob/v3.8.10/kernel/mcp/server.go)
 
-## Prerequisites
+Examples below were checked against official SiYuan v3.8.10. Inspect the installed version and its `--help` before using version-dependent commands.
 
-1. Confirm SiYuan kernel is reachable (usually `127.0.0.1:6806`).
-2. Obtain API token from secure storage.
-3. Always send:
-   - `Content-Type: application/json`
-   - `Authorization: Token <token>`
-4. Prefer environment-driven config in automation:
-   - `SIYUAN_BASE_URL`
-   - `SIYUAN_TOKEN`
-   - `SIYUAN_CONF_PATH`
+## Choose the Interface
 
-## Minimal Verified CRUD Workflow
+### Local workspace: official CLI
 
-1. `POST /api/notebook/createNotebook`
-   - input: `{"name":"<notebook-name>"}`
-   - verify: `lsNotebooks` count/name changed
-2. `POST /api/filetree/createDocWithMd`
-   - input: `{"notebook":"<nbid>","path":"/","markdown":"# title\n\nbody"}`
-   - verify: `listDocsByPath` contains created doc
-3. Read checks (choose at least one):
-   - `POST /api/filetree/listDocsByPath`
-   - `POST /api/search/fullTextSearchBlock`
-   - `POST /api/query/sql`
-4. Content update:
-   - `POST /api/block/appendBlock`
-   - input: `{"parentID":"<doc-root-id>","dataType":"markdown","data":"..."}`
-   - verify: query/search can read updated text
-5. Optional rename:
-   - `POST /api/filetree/renameDoc`
-   - `POST /api/notebook/renameNotebook`
-   - verify by list APIs
-6. Cleanup delete:
-   - `POST /api/filetree/removeDoc`
-   - `POST /api/notebook/removeNotebook`
-   - verify by before/after diff
+The official CLI accesses workspace data directly; it does not require a running HTTP server. Use `siyuan` when the official installation has configured it, or the packaged `resources/kernel/SiYuan-Kernel` binary. Keep its packaged resources available. Do not assume `siyuan` is already on PATH.
 
-## Extended Capability Workflows
+Specify the intended workspace with `-w`. The workspace must be local to the machine executing the CLI; a remote server URL is not a workspace path. For tests, use a separate disposable workspace, never personal notes. Avoid concurrent writers to the same workspace; if the application/server is actively using it, prefer its supported remote interface or arrange a safe maintenance window.
 
-### Image Asset Flow
+Read-only examples (replace the workspace, keyword and document ID):
 
-1. Upload local asset
-   - `POST /api/asset/insertLocalAssets`
-   - payload: `{"assetPaths":["/abs/path.png"],"isUpload":true,"id":"<doc-root-id>"}`
-2. Parse uploaded path from `data.succMap`
-3. Append image markdown block explicitly
-   - `POST /api/block/appendBlock`
-4. Verify image presence
-   - `POST /api/asset/getDocImageAssets`
-   - payload: `{"id":"<doc-root-id>"}`
+```bash
+siyuan --version
+siyuan --help
+siyuan notebook list -w /absolute/path/to/workspace -f json
+siyuan search "keyword" -w /absolute/path/to/workspace -f json
+siyuan block kramdown --id DOCUMENT_ID -w /absolute/path/to/workspace -f json
+```
 
-### Template Flow
+Use the appropriate command's `--help` for document creation/rename, block updates, attributes, assets, templates, export and other operations. Prefer supported file/stdin input for long or literal Markdown. Do not rewrite literal `\n` sequences automatically. CLI access to encrypted notebooks is not supported in v3.8.10; use the dedicated in-app workflow instead.
 
-1. Save doc as template
-   - `POST /api/template/docSaveAsTemplate`
-   - payload: `{"id":"<doc-root-id>","name":"<name>","overwrite":true}`
-2. Locate template path
-   - `POST /api/search/searchTemplate`
-3. Render template
-   - `POST /api/template/render`
-   - payload: `{"id":"<doc-root-id>","path":"<template-path>"}`
-4. Cleanup temporary template
-   - `POST /api/search/removeTemplate`
+### Running or remote instance: official MCP or documented HTTP API
 
-### Export Flow
+Use the instance's official MCP interface when the client supports it and the required tools are exposed. Confirm version, authentication and allowed tools first. Otherwise use the version-matched documented HTTP API. These are separate interfaces, not flags for turning the local CLI into a remote client.
 
-1. Export markdown zip
-   - `POST /api/export/exportMd`
-   - payload: `{"id":"<doc-root-id>"}`
-2. Verify `data.zip` exists in response
+For HTTP calls, follow the official API's request/response and authentication contract; use an authorized API token from secure storage. Check both HTTP status and the API business result. Do not assume an HTTP 200 response means success. Do not assume local anonymous access will work remotely. Do not print credentials or full configuration responses.
 
-### Plugin/Bazaar Read Flow
+Paths passed to a server-side local-file import refer to files on that server. They do not upload bytes from the client's filesystem. For remote assets, use an officially supported upload mechanism and verify the resulting asset reference.
 
-- `POST /api/bazaar/getInstalledPlugin`
-- `POST /api/bazaar/getBazaarPlugin`
+## Required Maintenance Workflow
 
-Payload:
+1. **Identify and read:** confirm workspace/instance, notebook/document IDs, existing content and the scope the user authorized. Capture the relevant before-state.
+2. **Plan a bounded change:** specify the intended content/title/path delta. For destructive or broad changes, establish a suitable backup/recovery path and obtain any required approval. Use a command's documented dry-run mode when available, but do not treat a preview as a write.
+3. **Execute once:** use the official interface and capture its result, returned IDs and errors. Keep existing document/block IDs so recovery can target the same object.
+4. **Read back:** verify the precise delta with an independent read, not just the write response:
+   - Create: the returned ID exists in the intended notebook and location.
+   - Rename/move: the same ID has the requested title/location.
+   - Content update: read the relevant block/body and confirm the change without unintended surrounding edits.
+   - Assets/templates/export: confirm the expected reference or output artifact is accessible; a server path alone is not a downloaded file.
+   - Delete: verify the authorized object is absent and unrelated objects remain.
+5. **Recover carefully:** a failed follow-up step does not undo a successful create. On a timeout or lost/invalid response, the write outcome may be unknown. Inspect the existing object before retrying; never blindly rerun creation or a destructive operation.
+6. **Report and clean up:** distinguish verified changes, partial success, uncertain outcomes and unrun checks. Remove only authorized test artifacts and verify cleanup.
 
-- `{"frontend":"desktop","keyword":""}`
+For persistence-sensitive testing, stop/restart only the disposable test instance and read back the same IDs and content. Do not interrupt a personal running instance merely to test persistence.
 
-## Verification Rules (Required)
+## Logging and Output
 
-For every write endpoint:
+Log only necessary operational metadata: interface/command or endpoint, object IDs, before/after counts or hashes, elapsed time and verification status. Avoid tokens, full configuration blobs, unnecessary note content and unbounded plugin/package responses.
 
-1. Capture `before` state (count/id/name/path)
-2. Execute write request
-3. Capture `after` state with a read endpoint
-4. Mark success only if expected state delta is present
+Return:
 
-Never mark success from `code=0` alone.
+1. Operation summary: expected change, observed before/after state and verified/failed/uncertain status.
+2. Partial results and existing IDs needed for recovery, with the next safe step.
+3. Verification limits and cleanup status.
 
-## Common Pitfalls
-
-1. Empty payload no-op can still return `code=0`.
-2. Wrong token fails explicitly; local anonymous access can be inconsistent across setups.
-3. `getConf` may expose sensitive secrets; never log full response.
-4. New docs may default to `未命名文档.sy`; rename explicitly if title matters.
-5. Some write/delete endpoints return `data: null`; rely on state verification.
-6. Plugin APIs can return very large payloads (including long README HTML strings).
-7. `insertLocalAssets` uploads assets but API-only scripts should still append/verify document content explicitly.
-
-## Safe Logging Template
-
-Log only redacted operational metadata:
-
-- endpoint
-- operation id
-- notebook/doc id
-- before snapshot hash/count
-- after snapshot hash/count
-- latency
-- result (`verified` or `unverified`)
-
-Do not log tokens or raw full config blobs.
-Do not log full plugin package bodies; keep package count and selected summary fields only.
-
-## Output Contract
-
-When executing this skill, return:
-
-1. Operation table: step, endpoint, expected delta, actual delta, pass/fail
-2. Pitfalls found in current environment
-3. Cleanup status (whether test artifacts were removed)
-
-## Script-First Mode
-
-Prefer this wrapper for repeatable operations:
-
-- `python3 scripts/siyuanctl.py ...`
-
-Current supported command groups:
-
-- `sync`: `info|dirs|run`
-- `notebook`: `list|create|set-icon|remove`
-- `doc`: `create|list|append-md|remove`
-- `asset`: `upload|doc-images`
-- `template`: `save|search|render|remove`
-- `export`: `md`
-- `bazaar`: `installed-plugins|remote-plugins` (read-only)
-
-Use raw API calls only when CLI does not yet cover required endpoints.
+Keep official documentation as the source of command/API details. Do not recreate a parallel command registry or compatibility wrapper in this skill.

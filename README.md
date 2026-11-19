@@ -34,12 +34,7 @@
     │       └── openai.yaml
     └── siyuan-openclaw-kb-maintenance/    # 思源笔记知识库维护
         ├── SKILL.md
-        ├── README.md
-        ├── scripts/
-        │   └── siyuanctl.py
-        └── tests/
-            ├── __init__.py
-            └── test_siyuanctl.py
+        └── README.md
 ```
 
 ## 技能索引
@@ -67,10 +62,10 @@
 
 ### [思源笔记知识库维护](./skills/siyuan-openclaw-kb-maintenance/README.md)
 
-通过 SiYuan API 进行知识库自动化维护的脚本优先工具集。
+基于思源官方 CLI、MCP 或文档化 API 的知识库维护工作流，不维护独立命令行实现。
 
-- **核心能力**：笔记本/文档 CRUD、资产管理、模板操作、Markdown 导出
-- **适用场景**：API 自动化维护思源笔记、批量操作笔记库内容
+- **核心能力**：官方接口选择、操作前后状态验证、部分成功恢复、安全日志
+- **适用场景**：本地或远程维护思源笔记，在明确授权下可靠修改知识库
 
 ## 安装
 

@@ -126,7 +126,7 @@ def cmd_doc_create(args: argparse.Namespace, token: str) -> Dict[str, Any]:
             token,
             {"notebook": args.notebook_id, "path": f"/{doc_id}.sy", "title": args.title},
         )
-        return {"create": result, "rename": rename, "data": doc_id, "code": result.get("code"), "msg": result.get("msg", "")}
+        return {"create": result, "rename": rename, "data": doc_id, "code": rename.get("code"), "msg": rename.get("msg", "")}
     return result
 
 
@@ -365,8 +365,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     except SiyuanCtlError as exc:
         print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 1
-    print(json.dumps(out, ensure_ascii=False, indent=2))
-    return 0
+    failed = out.get("code", 0) != 0
+    print(json.dumps(out, ensure_ascii=False, indent=2), file=sys.stderr if failed else sys.stdout)
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

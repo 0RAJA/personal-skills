@@ -14,8 +14,8 @@ A successful exit status or API `code=0` is not sufficient evidence that the int
 ## Official Entry Points
 
 - [Download SiYuan](https://b3log.org/siyuan/download.html)
-- [Official CLI guide, v3.8.10](https://github.com/siyuan-note/siyuan/blob/v3.8.10/README.zh-CN.md#-命令行接口)
-- [Current CLI guide](https://github.com/siyuan-note/siyuan/blob/master/README.zh-CN.md#-命令行接口)
+- [Official CLI guide, v3.8.10](https://github.com/siyuan-note/siyuan/blob/v3.8.10/README.zh-CN.md#%EF%B8%8F-命令行接口)
+- [Current CLI guide](https://github.com/siyuan-note/siyuan/blob/master/README.zh-CN.md#%EF%B8%8F-命令行接口)
 - [Documented HTTP API, v3.8.10](https://github.com/siyuan-note/siyuan/blob/v3.8.10/docs/API.zh-CN.md)
 - [Official MCP server implementation, v3.8.10](https://github.com/siyuan-note/siyuan/blob/v3.8.10/kernel/mcp/server.go)
 
@@ -43,7 +43,7 @@ Use the appropriate command's `--help` for document creation/rename, block updat
 
 ### Running or remote instance: official MCP or documented HTTP API
 
-Use the instance's official MCP interface when the client supports it and the required tools are exposed. Confirm version, authentication and allowed tools first. Otherwise use the version-matched documented HTTP API. These are separate interfaces, not flags for turning the local CLI into a remote client.
+For SiYuan v3.8.10, use the instance's `/mcp` endpoint over Streamable HTTP when the client supports it. Confirm the instance, authentication and allowed tools by listing the exposed tools before the first write. Otherwise use the version-matched documented HTTP API. These are separate interfaces, not flags for turning the local CLI into a remote client.
 
 For HTTP calls, follow the official API's request/response and authentication contract; use an authorized API token from secure storage. Check both HTTP status and the API business result. Do not assume an HTTP 200 response means success. Do not assume local anonymous access will work remotely. Do not print credentials or full configuration responses.
 
@@ -54,7 +54,7 @@ Paths passed to a server-side local-file import refer to files on that server. T
 1. **Identify and read:** confirm workspace/instance, notebook/document IDs, existing content and the scope the user authorized. Capture the relevant before-state.
 2. **Plan a bounded change:** specify the intended content/title/path delta. For destructive or broad changes, establish a suitable backup/recovery path and obtain any required approval. Use a command's documented dry-run mode when available, but do not treat a preview as a write.
 3. **Execute once:** use the official interface and capture its result, returned IDs and errors. Keep existing document/block IDs so recovery can target the same object.
-4. **Read back:** verify the precise delta with an independent read, not just the write response:
+4. **Read back:** verify the precise delta with an independent read, preferably by returned document/block ID, not just the write response. A newly written object may not appear in search immediately. Retry the read within a bounded window if indexing is pending; do not repeat the write. If the read remains inconclusive, mark the outcome unverified. Check the expected result for each operation:
    - Create: the returned ID exists in the intended notebook and location.
    - Rename/move: the same ID has the requested title/location.
    - Content update: read the relevant block/body and confirm the change without unintended surrounding edits.

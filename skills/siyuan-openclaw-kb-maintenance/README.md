@@ -7,8 +7,8 @@
 ## 官方入口
 
 - [思源官方下载](https://b3log.org/siyuan/download.html)
-- [官方 CLI 指南（v3.8.10，本次核验版本）](https://github.com/siyuan-note/siyuan/blob/v3.8.10/README.zh-CN.md#-命令行接口)
-- [当前官方 CLI 指南](https://github.com/siyuan-note/siyuan/blob/master/README.zh-CN.md#-命令行接口)
+- [官方 CLI 指南（v3.8.10，本次核验版本）](https://github.com/siyuan-note/siyuan/blob/v3.8.10/README.zh-CN.md#%EF%B8%8F-命令行接口)
+- [当前官方 CLI 指南](https://github.com/siyuan-note/siyuan/blob/master/README.zh-CN.md#%EF%B8%8F-命令行接口)
 - [官方 HTTP API 文档（v3.8.10）](https://github.com/siyuan-note/siyuan/blob/v3.8.10/docs/API.zh-CN.md)
 - [官方 MCP 服务实现（v3.8.10）](https://github.com/siyuan-note/siyuan/blob/v3.8.10/kernel/mcp/server.go)
 
@@ -28,7 +28,7 @@ siyuan block kramdown --id DOCUMENT_ID -w /absolute/path/to/workspace -f json
 
 ### 运行中的或远程实例
 
-根据客户端能力和实例配置选择官方 MCP，或使用版本匹配的官方 HTTP API，并按官方要求配置鉴权。它们不是本地 CLI 的远程模式。涉及资源文件时，区分服务端路径导入和客户端文件上传。
+思源 v3.8.10 的内置 MCP 入口为实例的 `/mcp`，使用 Streamable HTTP。配置鉴权后，先检查客户端能否列出所需工具；否则使用与实例版本对应的官方 HTTP API。它们不是本地 CLI 的远程模式。涉及资源文件时，区分服务端路径导入和客户端文件上传。
 
 ## 维护原则
 
@@ -36,7 +36,7 @@ siyuan block kramdown --id DOCUMENT_ID -w /absolute/path/to/workspace -f json
 
 1. 操作前读取对象、内容及授权范围。
 2. 使用官方接口执行一次有边界的改动。
-3. 用读取操作确认同一对象的实际变化；退出码 `0` 或 API `code=0` 都不能替代读回验证。
+3. 优先按返回的文档或块 ID 读回；索引未就绪时，有界重试读取，不重发写入。退出码 `0` 或 API `code=0` 都不能替代读回验证。
 4. 失败时区分部分成功与结果未知，保留已创建对象 ID，先查状态再重试，避免重复创建。
 5. 报告已验证结果、未验证部分和清理情况，不记录凭据或无关笔记内容。
 

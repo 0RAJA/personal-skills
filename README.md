@@ -32,6 +32,12 @@
     │   │   └── maintenance-record.md
     │   └── agents/
     │       └── openai.yaml
+    ├── open-source-component-launch/      # 开源组件从立项到首发
+    │   ├── SKILL.md
+    │   ├── README.md
+    │   └── references/
+    │       ├── existing-options.md
+    │       └── python-pypi-release.md
     └── siyuan-openclaw-kb-maintenance/    # 思源笔记知识库维护
         ├── SKILL.md
         └── README.md
@@ -59,6 +65,13 @@
 
 - **核心能力**：轻量阶段约束、入口可达的单一维护源、版本保全与安全恢复，以及贯通三者的完整案例与脱敏回归用例
 - **适用场景**：持续事项跟进、讨论与证据沉淀、阶段产物保全、跨会话接续及既有材料整理
+
+### [开源组件从立项到首发](./skills/open-source-component-launch/README.md)
+
+从现成方案对比、原型验证、仓库和文档搭建，到首次发布的可复用工作流。
+
+- **核心能力**：判断复用还是自研、验证关键行为、在合入前和发布前后检查实际交付产物
+- **适用场景**：抽取内部组件、开发独立库或 CLI、审查首发准备情况
 
 ### [思源笔记知识库维护](./skills/siyuan-openclaw-kb-maintenance/README.md)
 
